@@ -1,6 +1,6 @@
 # main.tf
 
-# This file provisions a simple EC2 instance in an existing AWS VPC using
+# This file provisions a simple EC2 instance in a new VPC using
 # reusable, community-maintained AWS Terraform modules.
 # It is designed to be as simple as possible while demonstrating
 # best practices for modular, clean code.
@@ -26,21 +26,40 @@ provider "aws" {
 }
 
 # ---
-# 2. Existing VPC Data Source
+# 2. VPC Module
 # ---
 
-# Use a data source to look up an existing VPC by its ID.
-# Replace "your-vpc-id" with the actual ID of your VPC.
-data "aws_vpc" "existing" {
-  id = "your-vpc-id"
-}
+# This module creates a new VPC with public and private subnets,
+# an Internet Gateway, and NAT Gateways. We are using the
+# official `terraform-aws-modules/vpc/aws` module.
+# The `version` is pinned to ensure the code is compatible with
+# the required Terraform version.
 
-# We'll use a data source to find a public subnet within the existing VPC.
-# This assumes there is at least one public subnet available.
-data "aws_subnet" "public" {
-  vpc_id = data.aws_vpc.existing.id
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "3.18.1"
+
+  # Basic VPC configuration
+  name = "ikurtz-vpc-test"
+  cidr = "10.0.0.0/16"
+
+  # We'll create a single public subnet for our EC2 instance
+  # to make it accessible for this example.
+  azs            = ["us-east-1a"]
+  public_subnets = ["10.0.1.0/24"]
+
+  # Enable the Internet Gateway and a single NAT Gateway
+  # for the public subnet.
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
+  enable_dns_hostnames   = true
+  enable_dns_support     = true
+  map_public_ip_on_launch = true
+
+  # A simple tag to identify our resources
   tags = {
-    Name = "*public*" # This is a common naming convention for public subnets
+    Owner       = "ikurtz"
+    Environment = "harness-se"
   }
 }
 
@@ -65,7 +84,7 @@ module "ec2_instance" {
 
   # Connect the instance to the public subnet from our VPC module.
   # The subnet_id is an output from the VPC module.
-  subnet_id = data.aws_subnet.public.id
+  subnet_id = module.vpc.public_subnets[0]
 
   # Assign a public IP to the instance so we can access it.
   associate_public_ip_address = true
@@ -106,5 +125,5 @@ output "instance_public_ip" {
 # This output provides the public subnet ID where the EC2 instance is located.
 output "public_subnet_id" {
   description = "The ID of the public subnet."
-  value       = data.aws_subnet.public.id
+  value       = module.vpc.public_subnets[0]
 }
