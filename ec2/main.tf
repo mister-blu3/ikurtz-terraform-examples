@@ -22,7 +22,7 @@ terraform {
 
 # Configure the AWS provider with a default region.
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 # ---
