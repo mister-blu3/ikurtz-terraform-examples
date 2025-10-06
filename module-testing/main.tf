@@ -9,9 +9,9 @@ module "harness_module_pass" {
 
 # Scenario B: Local Module (PASS)
 # The Rego policy explicitly allows relative paths
-module "local_module_pass" {
-  source = "./modules/local-test" 
-}
+# module "local_module_pass" {
+  # source = "./modules/local-test" 
+# }
 
 # Scenario C: Public/External Registry Module (FAIL)
 # The Rego policy will DENY this because it does not start with the allowed prefixes.
