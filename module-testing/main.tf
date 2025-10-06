@@ -3,7 +3,7 @@
 module "harness_module_pass" {
   # Replace ORG/NAME/PROVIDER with the actual path Harness gives you
   source  = "app.harness.io/EeRjnXTnS4GrLG5VNNJZUw/ikurtz-basic-module-test/aws" 
-  version = "1.0.1" 
+  version = "1.0.2" 
   file_path = "/tmp/harness-test.txt"
 }
 
