@@ -1,5 +1,8 @@
 # Scenario A: Harness Module Registry (PASS)
 # The source MUST match the format registered in Harness (e.g., app.harness.io/ORG/NAME/PROVIDER)
+provider "aws" {
+  region = "us-east-1"  # Replace with your desired AWS region
+
 module "harness_module_pass" {
   # Replace ORG/NAME/PROVIDER with the actual path Harness gives you
   source  = "app.harness.io/EeRjnXTnS4GrLG5VNNJZUw/ikurtz-basic-module-test/aws" 
